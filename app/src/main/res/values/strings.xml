@@ -33,6 +33,8 @@
     <string name="confirmacao_execucao_viagem">Deseja realmente remover a viagem ?</string>
     <string name="sim">Sim</string>
     <string name="nao">Não</string>
+    <string name="registro_salvo">Registro Salvo</string>
+    <string name="erro_salvar">Erro ao salvar</string>
 
     <!-- gasto.xml -->
     <string name="valor">Valor</string>
