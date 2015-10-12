@@ -86,7 +86,7 @@
         </TableRow>
 
         <Button
-            android:onClick="criarViagem"
+            android:onClick="salvarViagem"
             android:text="@string/criar_nova_viagem" />
 
     </TableLayout>
