@@ -22,18 +22,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import br.com.casasdocodigo.boaviagem.dao.BoaViagemDAO;
+import br.com.casasdocodigo.boaviagem.domain.Viagem;
+
 /**
  * Created by Lucas on 30/08/2015.
  */
 public class ViagemActivity extends Activity {
 
     private String id;
-    private DatabaseHelper helper;
     private EditText destino, quantidadePessoas, orcamento;
     private RadioGroup radioGroup;
     private Button dataChegadaButton,dataSaidaButton;
     private int ano, mes, dia;
     private Calendar dataChegada,dataSaida;
+    private BoaViagemDAO viagemDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +57,7 @@ public class ViagemActivity extends Activity {
         orcamento = (EditText)findViewById(R.id.orcamento);
         quantidadePessoas = (EditText)findViewById(R.id.quantidadePessoas);
         radioGroup = (RadioGroup)findViewById(R.id.tipoViagem);
-
-        helper = new DatabaseHelper(this);
+        viagemDAO = new BoaViagemDAO(this);
 
         id = getIntent().getStringExtra(Constantes.VIAGEM_ID);
         if(id != null)
@@ -64,28 +66,22 @@ public class ViagemActivity extends Activity {
     }
 
     private void prepararEdicao() {
-        SQLiteDatabase db = helper.getReadableDatabase();
+        final Viagem viagem = viagemDAO.findOne(Long.parseLong(id));
 
-        Cursor cursor = db.rawQuery("SELECT tipo_viagem, destino, data_chegada, " +
-                "data_saida, quantidade_pessoas, orcamento " +
-                "FROM viagem WHERE _id = ?", new String[] {id});
-        cursor.moveToFirst();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        if(cursor.getInt(0) == Constantes.VIAGEM_LAZER){
+        if(viagem.getTipoViagem() == Constantes.VIAGEM_LAZER){
             radioGroup.check(R.id.lazer);
         } else {
             radioGroup.check(R.id.negocios);
         }
 
-        destino.setText(cursor.getString(1));
-        dataChegada.setTimeInMillis(cursor.getLong(2));
-        dataSaida.setTimeInMillis(cursor.getLong(3));
+        destino.setText(viagem.getDestino());
+        dataChegada.setTime(viagem.getDataChegada());
+        dataSaida.setTime(viagem.getDataSaida());
         dataChegadaButton.setText(dateFormat.format(dataChegada.getTime()));
         dataSaidaButton.setText(dateFormat.format(dataSaida.getTime()));
-        quantidadePessoas.setText(cursor.getString(4));
-        orcamento.setText(cursor.getString(5));
-        cursor.close();
-
+        quantidadePessoas.setText(String.valueOf(viagem.getQuantidadePessoas()));
+        orcamento.setText(String.valueOf(viagem.getOrcamento()));
     }
 
     @Override
@@ -156,38 +152,34 @@ public class ViagemActivity extends Activity {
 
 
     public void salvarViagem(View view) {
-        SQLiteDatabase db = helper.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put("destino",destino.getText().toString());
-        values.put("data_chegada",dataChegada.getTimeInMillis());
-        values.put("data_saida",dataSaida.getTimeInMillis());
-        values.put("orcamento",orcamento.getText().toString());
-        values.put("quantidade_pessoas",quantidadePessoas.getText().toString());
+        Viagem viagem = new Viagem();
+        viagem.setDestino(destino.getText().toString());
+        viagem.setDataChegada(dataChegada.getTime());
+        viagem.setDataSaida(dataSaida.getTime());
+        viagem.setOrcamento(Double.parseDouble(orcamento.getText().toString()));
+        viagem.setQuantidadePessoas(Integer.parseInt(quantidadePessoas.getText().toString()));
 
         int tipo = radioGroup.getCheckedRadioButtonId();
 
         if(tipo == R.id.lazer) {
-            values.put("tipo_viagem",Constantes.VIAGEM_LAZER);
+            viagem.setTipoViagem(Constantes.VIAGEM_LAZER);
         } else {
-            values.put("tipo_viagem",Constantes.VIAGEM_NEGOCIOS);
+            viagem.setTipoViagem(Constantes.VIAGEM_NEGOCIOS);
         }
+
         long resultado;
         if(id == null){
-            resultado = db.insert("viagem", null, values);
+            viagem = viagemDAO.inserirViagem(viagem);
         } else {
-            resultado = db.update("viagem", values, "_id = ?", new String[]{ id });
+            viagem.setId(Long.parseLong(id));
+            viagem = viagemDAO.atualizarViagem(viagem);
         }
-        if(resultado != -1) {
+
+        if(viagem != null) {
             Toast.makeText(this,getString(R.string.registro_salvo),Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this,getString(R.string.erro_salvar),Toast.LENGTH_SHORT).show();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        helper.close();
-        super.onDestroy();
     }
 }
