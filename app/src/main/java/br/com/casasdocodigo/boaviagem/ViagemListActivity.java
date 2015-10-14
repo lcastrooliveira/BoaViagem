@@ -119,10 +119,14 @@ public class ViagemListActivity extends ListActivity implements AdapterView.OnIt
                 startActivity(intent);
                 break;
             case 1:
-                startActivity(new Intent(this, GastoActivity.class));
+                intent = new Intent(this, GastoActivity.class);
+                intent.putExtra(Constantes.VIAGEM_ID,id);
+                startActivity(intent);
                 break;
             case 2:
-                startActivity(new Intent(this, GastoListActivity.class));
+                intent = new Intent(this,GastoListActivity.class);
+                intent.putExtra(Constantes.VIAGEM_ID,id);
+                startActivity(intent);
                 break;
             case 3:
                 dialogConfirmacao.show();
