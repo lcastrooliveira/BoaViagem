@@ -48,12 +48,13 @@ public class GastoDAO {
 
     private Gasto cursorToBeanGasto(Cursor cursor) {
 
-        Integer viagemId = cursor.getInt(0);
-        String categoria = cursor.getString(1);
-        Date data = new Date(cursor.getLong(2));
-        String descricao = cursor.getString(3);
-        Double valor = cursor.getDouble(4);
-        String local = cursor.getString(5);
+        Integer viagemId = cursor.getInt(1);
+        String categoria = cursor.getString(2);
+        Date data = new Date(cursor.getLong(3));
+        String descricao = cursor.getString(4);
+        Double valor = cursor.getDouble(5);
+        String local = cursor.getString(6);
+
         return new Gasto(null,data,categoria,descricao,valor,local,viagemId);
 
     }

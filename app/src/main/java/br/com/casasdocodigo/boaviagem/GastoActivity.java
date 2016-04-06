@@ -49,9 +49,9 @@ public class GastoActivity extends Activity {
         categoria = (Spinner)findViewById(R.id.categoria);
         categoria.setAdapter(adapter);
 
-        valor = (EditText)this.findViewById(R.id.valor);
-        descricao = (EditText)this.findViewById(R.id.descricao);
-        local = (EditText)this.findViewById(R.id.local);
+        valor = (EditText)findViewById(R.id.valor);
+        descricao = (EditText)findViewById(R.id.descricao);
+        local = (EditText)findViewById(R.id.local);
 
     }
 
@@ -80,7 +80,7 @@ public class GastoActivity extends Activity {
         gasto.setLocal(local.getText().toString());
         gasto.setValor(Double.parseDouble(valor.getText().toString()));
         gasto.setViagemId(Integer.parseInt(viagemId));
-        gasto.setCategoria(categoria.getSelectedItem().toString());
+        gasto.setCategoria(categoria.getSelectedItem().toString().toUpperCase());
 
         Calendar data = Calendar.getInstance();
         data.set(Calendar.YEAR,ano);
